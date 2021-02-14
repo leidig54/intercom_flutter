@@ -64,7 +64,7 @@ id unread;
     }
     else if([@"presentArticle" isEqualToString:call.method]) {
         NSString *articleID = call.arguments[@"articleID"];
-        [Intercom presentArticle:articleID]
+        [Intercom presentArticle:articleID];
         result(@"Article presented");
     }
     else if([@"registerIdentifiedUserWithUserId" isEqualToString:call.method]) {
