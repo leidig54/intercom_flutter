@@ -60,8 +60,7 @@ class Intercom {
   }
 
   static Future<dynamic> presentArticle(String articleID) {
-    return _channel
-        .invokeListMethod("presentArticle", {'articleID': articleID});
+    return _channel.invokeMethod("presentArticle", {'articleID': articleID});
   }
 
   static Future<dynamic> registerIdentifiedUser({String userId, String email}) {
