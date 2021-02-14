@@ -62,6 +62,12 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
           result.success("User hash added")
         }
       }
+      call.method == "presentArticle" => {
+        val articleID = call.arguement<String>("articleID")
+        if(articleID != null){
+          Intercom.client().displayArticle(articleID);
+        }
+      }
       call.method == "registerIdentifiedUserWithUserId" -> {
         val userId = call.argument<String>("userId")
         if(userId != null) {

@@ -59,6 +59,11 @@ class Intercom {
     return _channel.invokeMethod('setUserHash', {'userHash': userHash});
   }
 
+  static Future<dynamic> presentArticle(String articleID) {
+    return _channel
+        .invokeListMethod("presentArticle", {'articleID': articleID});
+  }
+
   static Future<dynamic> registerIdentifiedUser({String userId, String email}) {
     if (userId?.isNotEmpty ?? false) {
       if (email?.isNotEmpty ?? false) {

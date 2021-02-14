@@ -62,6 +62,11 @@ id unread;
         [Intercom setUserHash:userHash];
         result(@"User hash added");
     }
+    else if([@"presentArticle" isEqualToString:call.method]) {
+        NSString *articleID = call.arguments[@"articleID"];
+        [Intercom presentArticle:@articleID]
+        result(@"Article presented");
+    }
     else if([@"registerIdentifiedUserWithUserId" isEqualToString:call.method]) {
         NSString *userId = call.arguments[@"userId"];
         [Intercom registerUserWithUserId:userId];
