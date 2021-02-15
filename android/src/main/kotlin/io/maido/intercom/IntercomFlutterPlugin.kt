@@ -3,11 +3,13 @@ package io.maido.intercom
 import android.app.Application
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import io.intercom.android.sdk.Company
 import io.intercom.android.sdk.Intercom
@@ -15,10 +17,9 @@ import io.intercom.android.sdk.UnreadConversationCountListener
 import io.intercom.android.sdk.UserAttributes
 import io.intercom.android.sdk.identity.Registration
 import io.intercom.android.sdk.push.IntercomPushClient
-import io.flutter.embedding.engine.plugins.activity.ActivityAware
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 
-class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler, ActivityAware {
+class IntercomFlutterPlugin :
+    FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler, ActivityAware {
   companion object {
     @JvmStatic lateinit var application: Application
 
@@ -35,10 +36,16 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
   private val intercomPushClient = IntercomPushClient()
   private var unreadConversationCountListener: UnreadConversationCountListener? = null
 
-  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    val channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "maido.io/intercom")
+  override fun onAttachedToEngine(
+      @NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
+  ) {
+    val channel =
+        MethodChannel(
+            flutterPluginBinding.getFlutterEngine().getDartExecutor(), "maido.io/intercom")
     channel.setMethodCallHandler(IntercomFlutterPlugin())
-    val unreadEventChannel = EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "maido.io/intercom/unread")
+    val unreadEventChannel =
+        EventChannel(
+            flutterPluginBinding.getFlutterEngine().getDartExecutor(), "maido.io/intercom/unread")
     unreadEventChannel.setStreamHandler(IntercomFlutterPlugin())
   }
 
@@ -57,20 +64,21 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
       }
       call.method == "setUserHash" -> {
         val userHash = call.argument<String>("userHash")
-        if(userHash != null) {
-          Intercom.client().setUserHash(userHash);
+        if (userHash != null) {
+          Intercom.client().setUserHash(userHash)
           result.success("User hash added")
         }
       }
-      call.method == "presentArticle" => {
+      call.method == "presentArticle" -> {
         val articleID = call.arguement<String>("articleID")
-        if(articleID != null){
-          Intercom.client().displayArticle(articleID);
+        if (articleID != null) {
+          Intercom.client().displayArticle(articleID)
+          result.success("Article displayed")
         }
       }
       call.method == "registerIdentifiedUserWithUserId" -> {
         val userId = call.argument<String>("userId")
-        if(userId != null) {
+        if (userId != null) {
           var registration = Registration.create()
           registration = registration.withUserId(userId)
           Intercom.client().registerIdentifiedUser(registration)
@@ -79,7 +87,7 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
       }
       call.method == "registerIdentifiedUserWithEmail" -> {
         val email = call.argument<String>("email")
-        if(email != null) {
+        if (email != null) {
           var registration = Registration.create()
           registration = registration.withEmail(email)
           Intercom.client().registerIdentifiedUser(registration)
@@ -96,7 +104,7 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
       }
       call.method == "setLauncherVisibility" -> {
         val visibility = call.argument<String>("visibility")
-        if(visibility != null) {
+        if (visibility != null) {
           Intercom.client().setLauncherVisibility(Intercom.Visibility.valueOf(visibility))
           result.success("Showing launcher: $visibility")
         }
@@ -115,7 +123,7 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
       }
       call.method == "setInAppMessagesVisibility" -> {
         val visibility = call.argument<String>("visibility")
-        if(visibility != null) {
+        if (visibility != null) {
           Intercom.client().setInAppMessageVisibility(Intercom.Visibility.valueOf(visibility))
           result.success("Showing in app messages: $visibility")
         } else {
@@ -133,16 +141,15 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
       call.method == "logEvent" -> {
         val name = call.argument<String>("name")
         val metaData = call.argument<Map<String, Any>>("metaData")
-        if(name != null) {
-          Intercom.client().logEvent(name, metaData);
+        if (name != null) {
+          Intercom.client().logEvent(name, metaData)
           result.success("Logged event")
         }
       }
-
       call.method == "sendTokenToIntercom" -> {
         val token = call.argument<String>("token")
         val metaData = call.argument<Map<String, Any>>("metaData")
-        if(token != null) {
+        if (token != null) {
           intercomPushClient.sendTokenToIntercom(application, token)
 
           result.success("Token sent to Intercom")
@@ -161,7 +168,8 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
         result.success("Message composer displayed")
       }
       call.method == "isIntercomPush" -> {
-        result.success(intercomPushClient.isIntercomPush(call.argument<Map<String, String>>("message")!!))
+        result.success(
+            intercomPushClient.isIntercomPush(call.argument<Map<String, String>>("message")!!))
       }
       call.method == "handlePush" -> {
         intercomPushClient.handlePush(application, call.argument<Map<String, String>>("message")!!)
@@ -215,15 +223,14 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
     }
 
     val seconds: Long? = signedUpAt?.toString()?.toLongOrNull()
-    if (seconds != null)
-      userAttributes.withSignedUpAt(seconds)
+    if (seconds != null) userAttributes.withSignedUpAt(seconds)
 
     return userAttributes.build()
   }
 
   override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-    unreadConversationCountListener = UnreadConversationCountListener { count -> events?.success(count) }
-        .also {
+    unreadConversationCountListener =
+        UnreadConversationCountListener { count -> events?.success(count) }.also {
           Intercom.client().addUnreadConversationCountListener(it)
         }
   }
@@ -240,12 +247,9 @@ class IntercomFlutterPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
     }
   }
 
-  override fun onDetachedFromActivity() {
-  }
+  override fun onDetachedFromActivity() {}
 
-  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-  }
+  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
 
-  override fun onDetachedFromActivityForConfigChanges() {
-  }
+  override fun onDetachedFromActivityForConfigChanges() {}
 }
