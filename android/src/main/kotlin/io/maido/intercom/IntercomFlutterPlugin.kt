@@ -70,7 +70,7 @@ class IntercomFlutterPlugin :
         }
       }
       call.method == "presentArticle" -> {
-        val articleID = call.arguement<String>("articleID")
+        val articleID = call.argument<String>("articleID")
         if (articleID != null) {
           Intercom.client().displayArticle(articleID)
           result.success("Article displayed")
