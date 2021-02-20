@@ -76,6 +76,13 @@ class IntercomFlutterPlugin :
           result.success("Article displayed")
         }
       }
+      call.method == "presentCarousel" -> {
+        val carouselID = call.argument<String>("carouselID")
+        if (carouselID != null) {
+          Intercom.client().displayCarousel(carouselID)
+          result.success("Article displayed")
+        }
+      }
       call.method == "registerIdentifiedUserWithUserId" -> {
         val userId = call.argument<String>("userId")
         if (userId != null) {

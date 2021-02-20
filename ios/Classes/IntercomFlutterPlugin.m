@@ -67,6 +67,11 @@ id unread;
         [Intercom presentArticle:articleID];
         result(@"Article presented");
     }
+     else if([@"presentCarousel" isEqualToString:call.method]) {
+        NSString *carouselID = call.arguments[@"carouselID"];
+        [Intercom presentCarousel:carouselID];
+        result(@"Carousel presented");
+    }
     else if([@"registerIdentifiedUserWithUserId" isEqualToString:call.method]) {
         NSString *userId = call.arguments[@"userId"];
         [Intercom registerUserWithUserId:userId];
