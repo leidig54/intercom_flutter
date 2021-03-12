@@ -116,6 +116,14 @@ id unread;
         [Intercom logout];
         result(@"Logged out");
     }
+    else if([@"setBottomPadding" isEqualToString:call.method]) {
+         NSNumber *value = call.arguments[@"bottomPadding"];
+         if(value != (id)[NSNull null] && value != nil) {
+             CGFloat padding = [value doubleValue];
+             [Intercom setBottomPadding:padding];
+             result(@"Set bottom padding");
+         }
+     }
     else if ([@"logEvent" isEqualToString:call.method]) {
         NSString *name = call.arguments[@"name"];
         NSDictionary *metaData = call.arguments[@"metaData"];

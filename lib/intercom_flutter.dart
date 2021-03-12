@@ -12,16 +12,16 @@ typedef void MessageHandler(Map<String, dynamic> message);
 class Intercom {
   static const MethodChannel _channel =
       const MethodChannel('maido.io/intercom');
-  static MessageHandler _messageHandler;
+  static MessageHandler? _messageHandler;
   static const EventChannel _unreadChannel =
       const EventChannel('maido.io/intercom/unread');
 
   /// This is useful since end application don't need to store the token by itself.
   /// It will be send through message handler so application can use it in any way it wants.
-  static String _iosDeviceToken;
+  static String? _iosDeviceToken;
 
-  static Future<dynamic> initialize(String appId,
-      {String androidApiKey, String iosApiKey, MessageHandler onMessage}) {
+  static Future<void> initialize(String appId,
+      {String? androidApiKey, String? iosApiKey, MessageHandler? onMessage}) {
     // Backward compatibility, show new feature in debug mode.
     if (onMessage == null && !kReleaseMode) {
       _messageHandler = (data) => print("[INTERCOM_FLUTTER] On message: $data");
@@ -40,10 +40,10 @@ class Intercom {
   static Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'iosDeviceToken':
-        String token = call.arguments;
+        String? token = call.arguments;
         _iosDeviceToken = token;
         if (_messageHandler != null) {
-          _messageHandler({"method": "iosDeviceToken", "token": token});
+          _messageHandler!({"method": "iosDeviceToken", "token": token});
         }
         return null;
       default:
@@ -62,11 +62,21 @@ class Intercom {
   static Future<dynamic> presentArticle(String articleID) {
     return _channel.invokeMethod("presentArticle", {'articleID': articleID});
   }
-   static Future<dynamic> presentCarousel(String carouselID) {
+
+  static Future<dynamic> presentCarousel(String carouselID) {
     return _channel.invokeMethod("presentCarousel", {'carouselID': carouselID});
   }
 
-  static Future<dynamic> registerIdentifiedUser({String userId, String email}) {
+  static Future<void> setBottomPadding(int padding) async {
+    await _channel.invokeMethod('setBottomPadding', {'bottomPadding': padding});
+  }
+
+  // static Future<void> setBottomPadding(int padding) async {
+  //   await _channel.invokeMethod('setBottomPadding', {'bottomPadding': padding});
+  // }
+
+  static Future<dynamic> registerIdentifiedUser(
+      {String? userId, String? email}) {
     if (userId?.isNotEmpty ?? false) {
       if (email?.isNotEmpty ?? false) {
         throw ArgumentError(
@@ -90,14 +100,14 @@ class Intercom {
   }
 
   static Future<dynamic> updateUser({
-    String email,
-    String name,
-    String phone,
-    String company,
-    String companyId,
-    String userId,
-    int signedUpAt,
-    Map<String, dynamic> customAttributes,
+    String? email,
+    String? name,
+    String? phone,
+    String? company,
+    String? companyId,
+    String? userId,
+    int? signedUpAt,
+    Map<String, dynamic>? customAttributes,
   }) {
     return _channel.invokeMethod('updateUser', <String, dynamic>{
       'email': email,
@@ -123,7 +133,7 @@ class Intercom {
     });
   }
 
-  static Future<int> unreadConversationCount() {
+  static Future<int?> unreadConversationCount() {
     return _channel.invokeMethod('unreadConversationCount');
   }
 
@@ -149,12 +159,12 @@ class Intercom {
   }
 
   static Future<dynamic> logEvent(String name,
-      [Map<String, dynamic> metaData]) {
+      [Map<String, dynamic>? metaData]) {
     return _channel
         .invokeMethod('logEvent', {'name': name, 'metaData': metaData});
   }
 
-  static Future<dynamic> sendTokenToIntercom(String token) {
+  static Future<dynamic> sendTokenToIntercom(String? token) {
     assert(token != null && token.isNotEmpty);
     print("Start sending token to Intercom");
     return _channel.invokeMethod('sendTokenToIntercom', {'token': token});
@@ -187,7 +197,7 @@ class Intercom {
         .invokeMethod('displayMessageComposer', {'message': message});
   }
 
-  static Future<bool> isIntercomPush(Map<String, dynamic> message) async {
+  static Future<bool?> isIntercomPush(Map<String, dynamic> message) async {
     if (!message.values.every((item) => item is String)) {
       return false;
     }
@@ -211,7 +221,7 @@ class Intercom {
   /// If users denies, calling this multiple times won't work. He needs to enter
   /// settings, find your application and turn notifications by himself.
   /// Return true if permissions are granted.
-  static Future<bool> requestIosNotificationPermissions() {
+  static Future<bool?> requestIosNotificationPermissions() {
     return _channel.invokeMethod('requestNotificationPermissions');
   }
 }

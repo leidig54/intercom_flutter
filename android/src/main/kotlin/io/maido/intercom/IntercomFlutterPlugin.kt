@@ -76,6 +76,13 @@ class IntercomFlutterPlugin :
           result.success("Article displayed")
         }
       }
+      call.method == "setBottomPadding" -> {
+        val padding = call.argument<Int>("bottomPadding")
+        if(padding != null) {
+          Intercom.client().setBottomPadding(padding)
+          result.success("Bottom padding set")
+        }
+      }
       call.method == "presentCarousel" -> {
         val carouselID = call.argument<String>("carouselID")
         if (carouselID != null) {

@@ -8,6 +8,8 @@ pubspec.lock
 build/
 .idea/
 android/bin/
+example/.flutter-plugins-dependencies
+example/ios/Flutter/flutter_export_environment.sh
 
 example/.flutter-plugins-dependencies
 example/ios/Flutter/Flutter.podspec
