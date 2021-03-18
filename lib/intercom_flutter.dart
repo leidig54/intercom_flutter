@@ -62,8 +62,13 @@ class Intercom {
   static Future<dynamic> presentArticle(String articleID) {
     return _channel.invokeMethod("presentArticle", {'articleID': articleID});
   }
-   static Future<dynamic> presentCarousel(String carouselID) {
+
+  static Future<dynamic> presentCarousel(String carouselID) {
     return _channel.invokeMethod("presentCarousel", {'carouselID': carouselID});
+  }
+
+  static Future<void> setBottomPadding(int padding) async {
+    await _channel.invokeMethod('setBottomPadding', {'bottomPadding': padding});
   }
 
   static Future<dynamic> registerIdentifiedUser({String userId, String email}) {
